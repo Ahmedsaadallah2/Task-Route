@@ -1,19 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useEffect } from "react";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Customers() {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
-  console.log(search);
+
   useEffect(() => {
     axios
-      .get("http://localhost:3500/customers")
-      .then((res) => setData(res.data))
+      .get("https://ahmedsaadallah2.github.io/api/db.json")
+      .then((res) => {
+        console.log(res.data); // Check the structure of the response
+        setData(res.data.customers || []); // Adjust based on actual structure
+      })
       .catch((err) => console.log(err));
   }, []);
+
   return (
     <>
       <div className="container w-1/2">
@@ -42,28 +44,26 @@ export default function Customers() {
             </thead>
             <tbody>
               {data
-                .filter((data) => {
-                  return search.toLocaleLowerCase() === ""
-                    ? data
-                    : data.name.toLocaleLowerCase().includes(search);
+                .filter((item) => {
+                  return search.toLowerCase() === ""
+                    ? true
+                    : item.name.toLowerCase().includes(search.toLowerCase());
                 })
-                .map((data, id) => {
-                  return (
-                    <tr
-                      key={id}
-                      className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
+                .map((item) => (
+                  <tr
+                    key={item.id} // Use a unique key
+                    className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
+                  >
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                     >
-                      <th
-                        scope="row"
-                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                      >
-                        {data.id}
-                      </th>
-                      <td className="px-6 py-4">{data.name}</td>
-                      <td className="px-6 py-4">{data.email}</td>
-                    </tr>
-                  );
-                })}
+                      {item.id}
+                    </th>
+                    <td className="px-6 py-4">{item.name}</td>
+                    <td className="px-6 py-4">{item.email}</td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
